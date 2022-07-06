@@ -1,0 +1,5 @@
+torch >= 1.6.0
+numpy
+mne
+h5py
+tvb

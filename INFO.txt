@@ -1,7 +1,0 @@
-All the files are placeholder functions to illustrate the functionality implemented in the directory. The full directory will be uploaded soon.
- 
-* main_train: the main training process, the trained neural network model will be saved in model_result.
-* eval_simulation: generate DeepSIF imaging results on synthetic data, evaluate the model performance.
-* eval_real: generate DeepSIF imaging results on real data.
-* forward/run_tvb: generate synthetic training and texting data.
-* anatomy: anatomical information used. See anatomy/README.md for more information.
