@@ -12,7 +12,7 @@ https://figshare.com/s/580622eaf17108da49d7.
 
 Please cite the following publication if you are using any part of the codes:
 
-Sun R, Sohrabpour A, Worrell GA, He B: “Deep Neural Networks Constrained by Neural Mass Models Improve Electrophysiological Source Imaging of Spatio-temporal Brain Dynamics.” Proceedings of the National Academy of Sciences, 2022.
+Sun R, Sohrabpour A, Worrell GA, He B: “Deep Neural Networks Constrained by Neural Mass Models Improve Electrophysiological Source Imaging of Spatio-temporal Brain Dynamics.” Proceedings of the National Academy of Sciences of the United States of America 119.31 (2022): e2201128119.
 
 
 
