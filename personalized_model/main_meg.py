@@ -175,6 +175,10 @@ def train(train_loader, model, criterion, optimizer, args_params):
         if (batch_idx + 1) % 500 == 0:
             print_s = "batch_idx_{}_time_{}_train_loss_{}".format(batch_idx, time.time() - start_time, train_loss[-1])
             logger.info(print_s)
+            # Save additional checkpoints for a smoother training/testing curve
+            # torch.save({
+            #     'state_dict': model.state_dict(), 'attribute_list': model.attribute_list},
+            #     'mepoch_{}_batch_{}'.format(args_params['epoch'], batch_idx))
     train_loss = torch.cat(train_loss).cpu().numpy()
     return train_loss
 # END TRAIN
