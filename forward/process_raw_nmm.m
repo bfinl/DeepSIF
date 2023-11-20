@@ -1,18 +1,18 @@
-function process_raw_nmm(filename, varargin)
+function process_raw_nmm(varargin)
 % Scan through the raw NMM data to find the spike data
 
 % %%%%%%%%%%%%%% SETUP PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 p = inputParser;
-addRequired(p,'filename',@ischar);
+addParameter(p,'filename','spikes',@ischar);
 addParameter(p,'leadfield_name','leadfield_75_20k.mat', @ischar);
-parse(p, filename, varargin{:})
+parse(p, varargin{:})
 filename = p.Results.filename;
 headmodel = load(['../anatomy/' p.Results.leadfield_name]);
 fwd = headmodel.fwd;
 savefile_path = '../source/';
 
 % -------------------------------------------------------------------------
-iter_list = 1:5;   % the iter during NMM generation.
+iter_list = 0:2;   % the iter during NMM generation.
 previous_iter_spike_num = zeros(1, 994);
 for i_iter = 1:length(iter_list)
     iter = iter_list(i_iter);
@@ -32,7 +32,7 @@ for i_iter = 1:length(iter_list)
     end
 
     % -------- start the main progress -----------------------------------%
-    for ii = 183:183%length(remaining_regions)
+    for ii = 1:1%length(remaining_regions)                                 % Change iteration to the num of NMM regions you want to generate
 
         i = remaining_regions(ii);
         % creat folders to save nmm files
@@ -41,9 +41,27 @@ for i_iter = 1:length(iter_list)
         end
 
         fn = [savefile_path 'raw_nmm/a' int2str(i-1) '/mean_iter_' int2str(iter) '_a_iter_' int2str(i-1)];
-        raw_data = load([fn '_ds.mat']);
-        nmm = raw_data.all_data;
-        % nmm = downsample(nmm, 4);
+        if isfile([fn '_ds.mat'])                                          % saved downsampled data before
+           raw_data = load([fn '_ds.mat']);
+           nmm = raw_data.all_data;
+        else
+           sub_iter_nmm_files = dir([fn '_*.mat']);
+           all_data = [];
+           all_time = [];
+           for sub_iter_i = 1:length(sub_iter_nmm_files)
+               d = load([sub_iter_nmm_files(sub_iter_i).folder '\' sub_iter_nmm_files(sub_iter_i).name]);
+               all_data = [all_data; d.data];
+               all_time = [all_time;d.time'];
+           end
+           all_data = all_data(1001:end,:);                                % Remove the unconverged beginning of the sample 
+           all_time = all_time(1001:end);
+           all_data = downsample(all_data, 4);
+           all_time = downsample(all_time, 4);                                       
+           nmm(:,[8,326,922,950]) = nmm(:,[995,998,997,996]);              % remove empty NMM row
+           nmm = nmm(:, 1:994);
+           save([fn '_ds.mat'],'all_data','all_time')   
+        end
+
         [spike_time, spike_chan] = find_spike_time(nmm);                   % Process raw tvb output to find the spike peak time
         
         % ----------- select the spikes we want to extract ---------------%

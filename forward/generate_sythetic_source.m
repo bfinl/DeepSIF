@@ -4,6 +4,7 @@ n_sources = 2;
 load('../anatomy/fs_cortex_20k_inflated.mat')
 load('../anatomy/fs_cortex_20k.mat')
 load('../anatomy/fs_cortex_20k_region_mapping.mat');
+load('../anatomy/dis_matrix_fs_20k.mat');
 % when load mat in python, python cannot read nan properly, so use a magic number to represent nan when saving
 NAN_NUMBER = 15213; 
 MAX_SIZE = 70;
@@ -117,22 +118,22 @@ selected_region = reshape(repmat(selected_region, 4, 1, 1), MAX_SIZE, n_sources,
 selected_region = permute(selected_region,[3,2,1]);
 %% SAVE
 dataset_name = 'source1';
-save([ds_type '_sample_' dataset_name '.mat'], 'selected_region')
+save(['../source/' ds_type '_sample_' dataset_name '.mat'], 'selected_region')
 %% ========================================================================
 %=============== Generate Other Parameters=================================
 %% NMM Signal Waveform
-random_samples = randi([0,nper-1],994*n_iter*4,n_sources);                 % the waveform index for each source
+random_samples = randi([1,nper],994*n_iter*4,n_sources);                 % the waveform index for each source
 nmm_idx = (selected_region(:,:,1)+1)*nper + random_samples + 1; 
-save([ds_type '_sample_' dataset_name '.mat'],'nmm_idx', 'random_samples',  '-append')
+save(['../source/' ds_type '_sample_' dataset_name '.mat'],'nmm_idx', 'random_samples',  '-append')
 %% SNR
 current_snr = reshape(repmat(5:5:20,n_iter*994,1)',[],1); 
-save([ds_type '_sample_' dataset_name '.mat'],'current_snr', '-append')
+save(['../source/' ds_type '_sample_' dataset_name '.mat'],'current_snr', '-append')
 %% Scaling Factor
 load('../anatomy/leadfield_75_20k.mat');
-gt = load([ds_type '_sample_' dataset_name '.mat']);
+gt = load(['../source/' ds_type '_sample_' dataset_name '.mat']);
 scale_ratio = [];
 n_source = size(gt.selected_region, 2);
-parfor i=1:size(gt.selected_region, 1)
+for i=1:size(gt.selected_region, 1)
     for k=1:n_source
         a = gt.selected_region(i,k,:);
         a = a(:);
@@ -145,22 +146,22 @@ parfor i=1:size(gt.selected_region, 1)
         end
     end
 end
-save([ds_type '_sample_' dataset_name '.mat'], 'scale_ratio', '-append')
+save(['../source/' ds_type '_sample_' dataset_name '.mat'], 'scale_ratio', '-append')
 %% Change Source Magnitude 
 clear mag_change
 point_05 = [40, 60];  % 45,35                                               % Magnitude falls to half of the centre region
 point_05 = randi(point_05);
 sigma = 0.8493*point_05;
 mag_change = [];
-parfor i=1:size(gt.selected_region,1)
+for i=1:size(gt.selected_region,1)
     for k=1:n_sources
         rg = gt.selected_region(i,k,:);
         rg(rg>1000) = [];
-        dis2centre = all_dis(rg(1)+1,rg+1);
+        dis2centre = raw_dis_matrix(rg(1)+1,rg+1);
         mag_change(i,k,:) = [exp(-dis2centre.^2/(2*sigma^2)) NAN_NUMBER*ones(1,size(gt.selected_region,3)-length(rg))];
     end
 end
-save([ds_type '_sample_' dataset_name '.mat'], 'mag_change', '-append')
+save(['../source/' ds_type '_sample_' dataset_name '.mat'], 'mag_change', '-append')
 %%
 function alpha = find_alpha(region_id, nmm_idx, fwd, target_SNR)
 % Re-scaling NMM channels in source channels
@@ -173,7 +174,7 @@ function alpha = find_alpha(region_id, nmm_idx, fwd, target_SNR)
 % OUTPUTS:
 %     - alpha      : the scaling factor for one patch source
 
-load(['../source/nmm_clip/a' int2str(region_id(1)-1) '/nmm_' int2str(nmm_idx) '.mat'])
+load(['../source/nmm_spikes/a' int2str(region_id(1)-1) '/nmm_' int2str(nmm_idx) '.mat'])
 spike_shape = data(:,region_id(1))/max(data(:,region_id(1)));
 [~, peak_time] = max(spike_shape);
 data(:, region_id) = repmat(spike_shape,1,length(region_id));
@@ -278,4 +279,17 @@ function [add_rg, rm_rg] = smooth_region(nbs, current_regions)
             rm_rg = [rm_rg current_rg];
         end
     end
+end
+
+
+function nn = mynorm(x, varargin)
+% Calcualte norm over the rows/columns of a matrix
+% x: defalut, d*n, calculated the norm over each column
+% the second input is the dimension
+if nargin > 1
+    nn = sqrt(sum(x.^2,varargin{1}));
+else
+    nn = sqrt(sum(x.^2, 1));
+end
+
 end
