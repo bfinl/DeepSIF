@@ -17,7 +17,9 @@ process_raw_nmm
 ```
 Parameters:
 * ```iter_list```: same as the length of ```mean_and_std``` in ```generate_tvb_data.py```
+This function provides extracted 1-second nmm segments with size 500*994(time*num_of_NMM) saved in source for each region.
 
 ```matlab
-generate_sythetic_source```
+generate_sythetic_source
+```
 The output of ```generate_sythetic_source``` can be used as input for ```loaders.SpikeEEGBuild``` or ```loaders.SpikeEEGBuildEval```, which describe now to load the nmm spikes, how to scale the background noise, etc.
