@@ -57,9 +57,10 @@ for i_iter = 1:length(iter_list)
            all_time = all_time(1001:end);
            all_data = downsample(all_data, 4);
            all_time = downsample(all_time, 4);                                       
-           nmm(:,[8,326,922,950]) = nmm(:,[995,998,997,996]);              % remove empty NMM row
-           nmm = nmm(:, 1:994);
-           save([fn '_ds.mat'],'all_data','all_time')   
+           all_data(:,[8,326,922,950]) = all_data(:,[995,998,997,996]);              % remove empty NMM row
+           all_data = all_data(:, 1:994);
+           save([fn '_ds.mat'],'all_data','all_time')
+           nmm = all_data;
         end
 
         [spike_time, spike_chan] = find_spike_time(nmm);                   % Process raw tvb output to find the spike peak time
