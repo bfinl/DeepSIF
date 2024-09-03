@@ -9,4 +9,4 @@ This work was supported in part by the National Institutes of Health grants NS09
 
 Please cite the following publication if you are using any part of the codes:
 
-Sun R, Zhang W, Bagić A, He B: “Deep learning based source imaging provides strong sublobar localization of epileptogenic zone from MEG interictal spikes.” NeuroImage, 2023.
+Sun R, Zhang W, Bagić A, He B: “Deep learning based source imaging provides strong sublobar localization of epileptogenic zone from MEG interictal spikes.” NeuroImage 281 (2023): 120366. DOI:10.1016/j.neuroimage.2023.120366

@@ -1,19 +1,21 @@
 # DeepSIF: Deep Learning based Source Imaging Framework
 
 
-DeepSIF is an EEG/MEG source imaging framework aiming at providing an estimation of the location, size, and temporal activity of the brain activities from scalp EEG/MEG recordings. There are three components: training data generation (```forward/```), neural network training (```main.py```), and model evaluation (```eval_sim.py```,```eval_recal.py```), as detailed below. The codes are provided as a service to the scientific community, and should be used at users’ own risks.
+DeepSIF is an EEG/MEG source imaging framework aiming at providing an estimation of the location, size, and temporal activity of the brain activities from scalp EEG/MEG recordings. There are three components: training data generation (```forward/```), neural network training (```main.py```), and model evaluation (```eval_sim.py```,```eval_recal.py```), as detailed below. 
 
+The codes are provided as a service to the scientific community, and should be used at users’ own risks.
 
 This work was supported in part by the National Institutes of Health grants NS096761, EB021027, AT009263, MH114233, EB029354, and NS124564, awarded to Dr. Bin He, Carnegie Mellon University. Additional data in 20 human epilepsy patients tested in this work can be found at
 
 
 https://figshare.com/s/580622eaf17108da49d7.
 
-
-Please cite the following publication if you are using any part of the codes:
+Please cite the following publications if you are using any part of the codes or data:
 
 Sun R, Sohrabpour A, Worrell GA, He B: “Deep Neural Networks Constrained by Neural Mass Models Improve Electrophysiological Source Imaging of Spatio-temporal Brain Dynamics.” Proceedings of the National Academy of Sciences of the United States of America 119.31 (2022): e2201128119.
 
+
+```./personalized_model``` contains information and code related to MEG spike source imaging with personalized headmodel. ```./ictal``` contains information and code related to EEG ictal source imaging. 
 
 
 ## Train Data Generation

@@ -284,6 +284,118 @@ class SpikeEEGBuildEval(Dataset):
         return self.dataset_len
 
 
+class SZNMMDatah5(Dataset):
+    
+    """Dataset, generate ictal training/testing data
+
+    Attributes
+    ----------
+    data_root : str
+        Dataset file location
+    fwd : np.array
+        Size is num_electrode * num_region
+    data : np.array
+        TVB output data
+    dataset_meta : dict
+        Information needed to generate data
+    dataset_len : int
+        size of the dataset, can be set as a small value during debugging
+    """
+
+    def __init__(self, data_root, fwd=np.array([0]), transform=None, args_params={}):
+
+        random.seed(15213)
+
+        self.file_path = data_root
+        self.fwd = fwd
+        self.transform = transform
+
+        self.data = []
+        self.dataset_meta = loadmat(self.file_path)
+
+
+        
+        # check args_params:
+        if 'dataset_len' in args_params:
+            self.dataset_len = args_params['dataset_len']
+        else:   # use the whole dataset
+            self.dataset_len = self.dataset_meta['selected_region'].shape[0]
+        if 'num_scale_ratio' in args_params:
+            self.num_scale = args_params['num_scale_ratio']
+        else:
+            self.num_scale = self.dataset_meta['scale_ratio'].shape[2]
+        self.snr_rsn_ratio = args_params['snr_rsn_ratio']
+        self.rsn = loadmat('anatomy/realistic_noise.mat')
+        # The seizure waveform is hard coded here.
+        self.dataset_meta['sz_source'] = loadmat('source/ictal_source_waveform.mat')['source']
+        self.scale_mag = args_params['scale_mag']
+        self.num_mag = self.dataset_meta['mag_change'].shape[0]
+
+    def __getitem__(self, index):
+
+        if not self.data:
+            self.data = h5py.File('{}_nmm.h5'.format(self.file_path[:-12]), 'r')['data']
+
+        raw_lb = self.dataset_meta['selected_region'][index].astype(np.int)
+        lb = raw_lb[np.logical_not(myisnan(raw_lb))]
+        raw_nmm = np.zeros((500, self.fwd.shape[1]))
+
+        for kk in range(raw_lb.shape[0]):
+
+            curr_lb = raw_lb[kk, np.logical_not(myisnan(raw_lb[kk]))]
+            current_nmm = self.data[self.dataset_meta['nmm_idx'][index][kk]]
+
+            ssig = current_nmm[:, [curr_lb[0]]]
+            # set source space SNR
+            ssig = ssig / np.max(abs(ssig)) * self.dataset_meta['scale_ratio'][index][kk][random.randint(0, self.num_scale - 1)]
+
+            if 'sz_source' in self.dataset_meta:
+                # select one type of sz sources
+                sig_type = random.randint(0, 3) * 5000
+                type_ind = [random.randint(0, 4999) + sig_type, random.randint(0, 4999) + sig_type]
+                ssig = self.dataset_meta['sz_source'][type_ind] * np.max(ssig)  # 'sz_source' is normalized to be 1
+                # ssig = np.tile(self.dataset_meta['source'][:, kk] * 500, (len(curr_lb), 1)).transpose() / min([0.8 * len(curr_lb), 5.])
+            # 2 type of spatial signal
+            if random.random() > 0.5:
+                same_source_ind = random.randint(0, 10)
+            else:
+                same_source_ind = len(curr_lb)
+
+            weight_decay = self.dataset_meta['mag_change'][random.randint(0, self.num_mag - 1)][index][kk][:]
+            weight_decay = weight_decay[np.logical_not(myisnan(weight_decay))]
+            current_nmm[:, curr_lb[0:same_source_ind]] = ssig[0, :].reshape(-1, 1) * weight_decay[0:same_source_ind]
+            current_nmm[:, curr_lb[same_source_ind:]] = ssig[1, :].reshape(-1, 1) * weight_decay[same_source_ind:]
+
+            raw_nmm = raw_nmm + current_nmm
+
+        eeg = np.matmul(self.fwd, raw_nmm.transpose())
+        csnr = self.dataset_meta['current_snr'][index]
+        
+        noisy_eeg = add_white_noise(eeg, csnr).transpose()
+        # scale the eeg
+        noisy_eeg = noisy_eeg - np.mean(noisy_eeg, axis=0, keepdims=True)
+        noisy_eeg = noisy_eeg - np.mean(noisy_eeg, axis=1, keepdims=True)
+        noisy_eeg = noisy_eeg / np.max(np.abs(noisy_eeg))
+        # get the training output
+        empty_nmm = np.zeros_like(raw_nmm)
+        empty_nmm[:, lb] = raw_nmm[:, lb]
+        empty_nmm = empty_nmm / np.abs(empty_nmm).max()
+        empty_nmm = empty_nmm[:, :994]
+
+        bw_label = np.zeros(994)
+        bw_label[lb] = 1
+        sample = {'data': noisy_eeg.astype('float32'),
+                  'nmm': empty_nmm.astype('float32'),
+                  'label': raw_lb,
+                  'bw_label': bw_label.astype('float32'),
+                  'snr': csnr}
+        if self.transform:
+            sample = self.transform(sample)
+        return sample
+
+    def __len__(self):
+        return self.dataset_len
+
 # from matplotlib import pyplot as plt
 # plt.subplot(1,2,1)
 # plt.plot(noisy_eeg)
