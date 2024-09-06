@@ -12,7 +12,7 @@ https://figshare.com/s/580622eaf17108da49d7.
 
 Please cite the following publications if you are using any part of the codes or data:
 
-Sun R, Sohrabpour A, Worrell GA, He B: “Deep Neural Networks Constrained by Neural Mass Models Improve Electrophysiological Source Imaging of Spatio-temporal Brain Dynamics.” Proceedings of the National Academy of Sciences of the United States of America 119.31 (2022): e2201128119.
+Sun R, Sohrabpour A, Worrell GA, He B: “Deep Neural Networks Constrained by Neural Mass Models Improve Electrophysiological Source Imaging of Spatio-temporal Brain Dynamics.” Proceedings of the National Academy of Sciences of the United States of America 119.31 (2022): e2201128119. DOI:10.1073/pnas.2201128119
 
 
 ```./personalized_model``` contains information and code related to MEG spike source imaging with personalized headmodel. ```./ictal``` contains information and code related to EEG ictal source imaging. 
