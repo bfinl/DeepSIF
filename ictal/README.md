@@ -18,6 +18,6 @@ This work was supported in part by the National Institutes of Health grants NS12
 
 
 
-Please cite the following publication if you are using any part of the codes:
+Please cite the following publication if you are using any part of the codes or data:
 
 Sun, R., Sohrabpour, A., Joseph, B., Worrell, G., & He, B. (2024). Spatiotemporal Rhythmic Seizure Sources Can be Imaged by means of Biophysically Constrained Deep Neural Networks. Advanced Science. DOI: 10.1002/advs.202405246
