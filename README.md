@@ -31,9 +31,9 @@ Run in Matlab
 process_raw_nmm
 generate_sythetic_source
 ```
-The output of ```generate_sythetic_source``` need to be converted to h5 format with name "train_998_snr15_nmm_all.h5"
+The output of ```process_raw_nmm``` need to be converted to h5 format with name "train_998_snr15_nmm_all.h5"
 
-"train_998_snr15_nmm_all.h5" is the input for ```loaders.SpikeEEGBuild``` or ```loaders.SpikeEEGBuildEval```
+"train_998_snr15_nmm_all.h5" and the output of "generate_sythetic_source" are required as the input for ```loaders.SpikeEEGBuild``` or ```loaders.SpikeEEGBuildEval```
 
 ## Training
 
