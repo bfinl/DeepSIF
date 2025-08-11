@@ -21,7 +21,7 @@ Sun R, Sohrabpour A, Worrell GA, He B: “Deep Neural Networks Constrained by Ne
 ## Train Data Generation
 #### The Virtual Brain Simulation
 ```bash
-python generate_tvb_data.py --a_start 0 --a_end 10
+python generate_tvb_data.py --a_start 0 --a_end 993
 ```
 The simulation for each region can also run in parallel. (Require multiprocessing installed.)
  
@@ -31,7 +31,9 @@ Run in Matlab
 process_raw_nmm
 generate_sythetic_source
 ```
-The output of ```generate_sythetic_source``` can be used as input for ```loaders.SpikeEEGBuild``` or ```loaders.SpikeEEGBuildEval```
+The output of ```generate_sythetic_source``` need to be converted to h5 format with name "train_998_snr15_nmm_all.h5"
+
+"train_998_snr15_nmm_all.h5" is the input for ```loaders.SpikeEEGBuild``` or ```loaders.SpikeEEGBuildEval```
 
 ## Training
 
